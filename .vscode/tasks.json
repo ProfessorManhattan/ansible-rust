@@ -62,6 +62,11 @@
       "command": "bash .config/scripts/start.sh && task ci:github:actions:test"
     },
     {
+      "label": "(commit): Add all and commit",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task commit"
+    },
+    {
       "label": "(common:clean): Removes optional folders that are cached during various tasks",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task common:clean"
@@ -237,9 +242,9 @@
       "command": "bash .config/scripts/start.sh && task lint:eslint"
     },
     {
-      "label": "(lint:esprint:esprint): Lint with `eslint` across multiple threads",
+      "label": "(lint:eslint:warn-all): Convert ESLint errors into warnings in `package.json`",
       "type": "shell",
-      "command": "bash .config/scripts/start.sh && task lint:esprint:esprint"
+      "command": "bash .config/scripts/start.sh && task lint:eslint:warn-all"
     },
     {
       "label": "(lint:esprint:esprint:stop): Stop the `esprint` process that is currently running",
@@ -305,6 +310,11 @@
       "label": "(lint:yaml): Lint .yml files using YAML Lint",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task lint:yaml"
+    },
+    {
+      "label": "(livereload): Start the project with live-reloading (i.e. watch mode)",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task livereload"
     },
     {
       "label": "(nest:benchmark): Initiate a web server benchmarking session (with `clinic`)",
