@@ -93,18 +93,18 @@ This repository is the home of an [Ansible](https://www.ansible.com/) role that 
 
 ## Features
 
-**Ensures Rust shell completions are set-up:**
-
-- Sets up shell completions for PowerShell on Windows
-- Sets up bash and zsh completions on macOS/Linux
-
 **Ensures Rust is installed:**
 
-- Installs Rust via `pacman` on Archlinux
 - Installs Rust via `brew` on macOS sudolessly
+- Installs Rust via `pacman` on Archlinux
+- Installs Rust on macOS, Linux, and Windows
 - Installs Rust via `snap` on Debian-flavored systems
 - Installs Rust via `snap` on RedHat-flavored systems
-- Installs Rust on macOS, Linux, and Windows
+
+**Ensures Rust shell completions are set-up:**
+
+- Sets up bash and zsh completions on macOS/Linux
+- Sets up shell completions for PowerShell on Windows
 
 <a href="#quick-start" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
