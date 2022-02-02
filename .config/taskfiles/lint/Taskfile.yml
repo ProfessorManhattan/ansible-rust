@@ -205,7 +205,7 @@ tasks:
           TMP="$(mktemp)";
           ESLINT_RULE="$(echo "$LINE" | grep 'errors ' | sed 's/.*rule:\ //')";
           if [ -n "$ESLINT_RULE" ]; then
-            jq --arg rule "$ESLINT_RULE" '.eslintConfig.rules[$rule] - "warn"' package.json > "$TMP";
+            jq --arg rule "$ESLINT_RULE" '.eslintConfig.rules[$rule] = "warn"' package.json > "$TMP";
             mv "$TMP" package.json;
           fi;
         done < "$ESLINT_TMP"
@@ -327,10 +327,8 @@ tasks:
     cmds:
       - |
         {{if .CLI_ARGS}}
-          .config/log info 'Linting {{.CLI_ARGS}} with flake8'
           {{.PYTHON_HANDLE}}flake8 --config {{.FLAKE8_CONFIG}} {{.CLI_ARGS}}
         {{else}}
-          .config/log info 'Linting the project with flake8'
           {{.PYTHON_HANDLE}}flake8 --config {{.FLAKE8_CONFIG}} .
         {{end}}
 
