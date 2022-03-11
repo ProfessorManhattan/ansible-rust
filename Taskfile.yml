@@ -11,9 +11,6 @@ includes:
   app:virtualbox: ./.config/taskfiles/app/Taskfile-virtualbox.yml
   boilerplate: ./.config/taskfiles/boilerplate/Taskfile.yml
   boilerplate:populate: ./.config/taskfiles/boilerplate/Taskfile-populate.yml
-  project:
-    taskfile: ./local/Taskfile-project.yml
-    optional: true
   boilerplate:prompt: ./.config/taskfiles/boilerplate/Taskfile-prompt.yml
   ci: ./.config/taskfiles/ci/Taskfile.yml
   ci:github: ./.config/taskfiles/ci/Taskfile-github.yml
@@ -54,6 +51,9 @@ includes:
   packer: ./.config/taskfiles/packer/Taskfile.yml
   packer:build: ./.config/taskfiles/packer/Taskfile-build.yml
   packer:update: ./.config/taskfiles/packer/Taskfile-update.yml
+  project:
+    taskfile: ./local/Taskfile-project.yml
+    optional: true
   publish: ./.config/taskfiles/publish/Taskfile.yml
   publish:android: ./.config/taskfiles/publish/Taskfile-android.yml
   publish:brew: ./.config/taskfiles/publish/Taskfile-brew.yml
@@ -675,3 +675,7 @@ tasks:
         else
           [[ $- == *i* ]] && task prepare || (.config/log error '{{.NONINTERACTIVE_MISSING_TEST_CMD}}' && exit 1)
         fi
+
+  update:
+    cmds:
+      - task: init
