@@ -339,6 +339,7 @@ tasks:
           bash <(curl -sSL {{.INIT_SCRIPT}})
         fi
       - git push origin master
+      - task: ci:synchronize
 
   lint:
     desc: Lints the project using all linters
