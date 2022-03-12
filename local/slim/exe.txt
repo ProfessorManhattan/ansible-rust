@@ -30,3 +30,11 @@ git-cz
 commitlint
 yq
 jq
+yq
+jq
+husky
+git-cz
+jq
+commitlint
+jq
+yq
