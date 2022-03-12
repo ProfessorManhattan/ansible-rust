@@ -542,6 +542,11 @@
       "command": "bash start.sh && task publish:opera:release"
     },
     {
+      "label": "(pull:upstream): Pull from upstream repositories",
+      "type": "shell",
+      "command": "bash start.sh && task pull:upstream"
+    },
+    {
       "label": "(python:build): Build the project",
       "type": "shell",
       "command": "bash start.sh && task python:build"

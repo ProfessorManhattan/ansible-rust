@@ -38,3 +38,6 @@ jq
 commitlint
 jq
 yq
+husky
+git-cz
+commitlint

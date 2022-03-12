@@ -244,6 +244,10 @@ tasks:
       ## CodeClimate CLI Testing
 
       Any folder in the `test/` folder that starts with `codeclimate` gets scanned by CodeClimate CLI.
+    log:
+      error: Encountered error during Docker test sequence
+      start: Initiating Docker test sequence
+      success: Successfully completed Docker test sequence
     cmds:
       - |
         if [ -f Docker.test.yml ]; then

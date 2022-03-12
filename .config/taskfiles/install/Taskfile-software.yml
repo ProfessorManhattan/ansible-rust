@@ -528,10 +528,22 @@ tasks:
   jq:
     run: once
     cmds:
+      - task: system
+        vars:
+          PACKAGE: jq
+      - task: jq:brew
+    status:
+      - type jq > /dev/null
+
+  jq:brew:
+    run: once
+    cmds:
       - task: brew:formulae
         vars:
           FORMULAE: jq
           INSTALL_TASK: '{{.TASK}}'
+    status:
+      - type jq > /dev/null
 
   kvm:
     run: once
@@ -707,6 +719,30 @@ tasks:
     status:
       - git subrepo --version > /dev/null || [[ "${container:=}" == "docker" ]]
 
+  system:
+    vars:
+      PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
+    cmds:
+      - |
+        if [ -n "$(which yum)" ]; then
+          yum -y install {{.PACKAGE}}
+          exit 0
+        fi
+        if [ -n "$(which apt-get)" ]; then
+          apt-get update && apt-get install -y {{.PACKAGE}}
+          exit 0
+        fi
+        if [ -n "$(which apk)" ]; then
+          apk --no-cache add {{.PACKAGE}}
+          exit 0
+        fi
+        if [ -n "$(which dnf)" ]; then
+          dnf install {{.PACKAGE}}
+          exit 0
+        fi
+    status:
+      - type {{.PACKAGE}} > /dev/null
+
   tokei:
     run: once
     cmds:
@@ -794,6 +830,16 @@ tasks:
           INSTALL_TASK: '{{.TASK}}'
 
   yq:
+    run: once
+    cmds:
+      - task: system
+        vars:
+          PACKAGE: yq
+      - task: yq:brew
+    status:
+      - type jq > /dev/null
+
+  yq:brew:
     run: once
     cmds:
       - task: brew:formulae

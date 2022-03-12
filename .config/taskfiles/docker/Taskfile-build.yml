@@ -150,6 +150,10 @@ tasks:
         sh: echo "{{.DOCKERHUB_PROFILE}}/{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
       SLUG:
         sh: echo "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
+    log:
+      error: Encountered error while generating compressed Docker image tar file
+      start: Generating compressed Docker image tar file(s)
+      success: Successfully generated compressed Docker image tar file(s)
     cmds:
       - |
         function zipUp() {
