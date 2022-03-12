@@ -195,10 +195,15 @@ tasks:
     cmds:
       - .config/log warn "Archlinux support for Homebrew is not very well documented.. if this does not work and you can get it working, please open a PR :)"
       - |
-        .config/log info 'Attempting to run `sudo pacman update` (for Homebrew dependencies)'
-        sudo pacman update
-        .config/log info 'Attempting to run `sudo pacman -S base-devel curl file git gzip procps-ng` (for Homebrew dependencies)'
-        sudo pacman -S base-devel curl file git gzip procps-ng
+        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          pacman update
+          pacman -S base-devel curl file git gzip procps-ng
+        elif type sudo &> /dev/null; then
+          .config/log info 'Attempting to run `sudo pacman update` (for Homebrew dependencies)'
+          sudo pacman update
+          .config/log info 'Attempting to run `sudo pacman -S base-devel curl file git gzip procps-ng` (for Homebrew dependencies)'
+          sudo pacman -S base-devel curl file git gzip procps-ng
+        fi
     status:
       - type curl &> /dev/null
       - type git &> /dev/null
@@ -211,10 +216,15 @@ tasks:
     interactive: true
     cmds:
       - |
-        .config/log info 'Attempting to run `sudo apt-get -y update` (for Homebrew dependencies)'
-        sudo apt-get -y update
-        .config/log info 'Attempting to run `sudo apt-get install -y build-essential curl file git procps` (Homebrew dependencies)'
-        sudo apt-get install -y build-essential curl file git gzip procps
+        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          apt-get -y update
+          apt-get install -y build-essential curl file git gzip procps
+        elif type sudo &> /dev/null; then
+          .config/log info 'Attempting to run `sudo apt-get -y update` (for Homebrew dependencies)'
+          sudo apt-get -y update
+          .config/log info 'Attempting to run `sudo apt-get install -y build-essential curl file git procps` (Homebrew dependencies)'
+          sudo apt-get install -y build-essential curl file git gzip procps
+        fi
     status:
       - type curl &> /dev/null
       - type git &> /dev/null
@@ -232,21 +242,33 @@ tasks:
           yum grouplist 'Development Tools' &> "$HOME/.config/bodega/yum-devtools-check-ran"
           DEV_TOOLS_NOT_INSTALLED="$(grep 'No groups match' < "$HOME/.config/bodega/yum-devtools-check-ran" > /dev/null)"
           if [[ "$DEV_TOOLS_NOT_INSTALLED" == '0' ]]; then
-            .config/log info 'Attempting to run `sudo yum groupinstall -y "Development Tools"`'
-            sudo yum groupinstall -y 'Development Tools'
+            if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+              yum groupinstall -y 'Development Tools'
+            elif type sudo &> /dev/null; then
+              .config/log info 'Attempting to run `sudo yum groupinstall -y "Development Tools"`'
+              sudo yum groupinstall -y 'Development Tools'
+            fi
           fi
           touch "$HOME/.config/bodega/yum-devtools-check-ran"
         fi
         if ! rpm --quiet --query curl file git gzip procps-ng; then
-          .config/log info 'Attempting to run `sudo yum install -y curl file git procps-ng`'
-          sudo yum install -y curl file git gzip procps-ng
+          if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+            yum install -y curl file git gzip procps-ng
+          elif type sudo &> /dev/null; then
+            .config/log info 'Attempting to run `sudo yum install -y curl file git procps-ng`'
+            sudo yum install -y curl file git gzip procps-ng
+          fi
         fi
         if [ -f '/etc/os-release' ]; then
           source /etc/os-release
           if [[ "$ID" == 'fedora' ]] && [ "$VERSION_ID" -gt "29" ]; then
             if ! rpm --quiet --query libxcrypt-compat; then
-              .config/log info 'Attempting to run `sudo yum -y install libxcrypt-compat` (Homebrew dependencies)'
-              sudo yum -y install libxcrypt-compat
+              if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+                yum install -y libxcrypt-compat
+              elif type sudo &> /dev/null; then
+                .config/log info 'Attempting to run `sudo yum -y install libxcrypt-compat` (Homebrew dependencies)'
+                sudo yum -y install libxcrypt-compat
+              fi
             fi
           fi
         fi
@@ -384,10 +406,15 @@ tasks:
   exiftool:
     run: once
     cmds:
+      - task: system
+        vars:
+          PACKAGE: exiftool
       - task: brew:formulae
         vars:
           FORMULAE: exiftool
           INSTALL_TASK: '{{.TASK}}'
+    status:
+      - type exiftool > /dev/null
 
   exit:notice:reload:
     cmds:
@@ -404,10 +431,15 @@ tasks:
   expect:
     run: once
     cmds:
+      - task: system
+        vars:
+          PACKAGE: expect
       - task: brew:formulae
         vars:
           FORMULAE: expect
           INSTALL_TASK: '{{.TASK}}'
+    status:
+      - type expect > /dev/null
 
   gcloud:
     run: once
@@ -445,6 +477,9 @@ tasks:
   git:
     run: once
     cmds:
+      - task: system
+        vars:
+          PACKAGE: git
       - task: common
     status:
       - type git > /dev/null
@@ -520,10 +555,15 @@ tasks:
   gzip:
     run: once
     cmds:
+      - task: system
+        vars:
+          PACKAGE: gzip
       - task: brew:formulae
         vars:
           FORMULAE: gzip
           INSTALL_TASK: '{{.TASK}}'
+    status:
+      - type gzip > /dev/null
 
   jq:
     run: once
@@ -531,13 +571,6 @@ tasks:
       - task: system
         vars:
           PACKAGE: jq
-      - task: jq:brew
-    status:
-      - type jq > /dev/null
-
-  jq:brew:
-    run: once
-    cmds:
       - task: brew:formulae
         vars:
           FORMULAE: jq
@@ -676,10 +709,15 @@ tasks:
   rsync:
     run: once
     cmds:
+      - task: system
+        vars:
+          PACKAGE: rsync
       - task: brew:formulae
         vars:
           FORMULAE: rsync
           INSTALL_TASK: '{{.TASK}}'
+    status:
+      - type rsync > /dev/null
 
   rust:
     run: once
@@ -722,26 +760,91 @@ tasks:
   system:
     vars:
       PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
+    log:
+      error: Failed to install `{{.PACKAGE}}` with the system package manager
+      start: Attempting to install `{{.PACKAGE}}` using the system package manager
     cmds:
-      - |
-        if [ -n "$(which yum)" ]; then
-          yum -y install {{.PACKAGE}}
-          exit 0
-        fi
-        if [ -n "$(which apt-get)" ]; then
-          apt-get update && apt-get install -y {{.PACKAGE}}
-          exit 0
-        fi
-        if [ -n "$(which apk)" ]; then
-          apk --no-cache add {{.PACKAGE}}
-          exit 0
-        fi
-        if [ -n "$(which dnf)" ]; then
-          dnf install {{.PACKAGE}}
-          exit 0
-        fi
+      - task: system:apk
+        vars:
+          PACKAGE: '{{.PACKAGE}}'
+      - task: system:apt-get
+        vars:
+          PACKAGE: '{{.PACKAGE}}'
+      - task: system:dnf
+        vars:
+          PACKAGE: '{{.PACKAGE}}'
+      - task: system:yum
+        vars:
+          PACKAGE: '{{.PACKAGE}}'
     status:
       - type {{.PACKAGE}} > /dev/null
+
+  system:apk:
+    vars:
+      PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
+    cmds:
+      - |
+        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          apk --no-cache add {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          sudo apk --no-cache add {{.PACKAGE}}
+        fi
+    status:
+      - '[ -z "$(which apk)" ]'
+
+  system:apt-get:
+    vars:
+      PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
+    cmds:
+      - |
+        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          apt-get update
+          apt-get install -y {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          sudo apt-get update
+          sudo apt-get install -y {{.PACKAGE}}
+        fi
+    status:
+      - '[ -z "$(which apt-get)" ]'
+
+  system:dnf:
+    vars:
+      PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
+    cmds:
+      - |
+        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          dnf install {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          sudo dnf install {{.PACKAGE}}
+        fi
+    status:
+      - '[ -z "$(which dnf)" ]'
+
+  system:pacman:
+    vars:
+      PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
+    cmds:
+      - |
+        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          pacman -S {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          sudo pacman -S {{.PACKAGE}}
+        fi
+    status:
+      - '[ -z "$(which pacman)" ]'
+
+  system:yum:
+    vars:
+      PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
+    cmds:
+      - |
+        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          yum install -y {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          sudo yum install -y {{.PACKAGE}}
+        fi
+    status:
+      - '[ -z "$(which yum)" ]'
 
   tokei:
     run: once
@@ -835,14 +938,9 @@ tasks:
       - task: system
         vars:
           PACKAGE: yq
-      - task: yq:brew
-    status:
-      - type jq > /dev/null
-
-  yq:brew:
-    run: once
-    cmds:
       - task: brew:formulae
         vars:
           FORMULAE: yq
           INSTALL_TASK: '{{.TASK}}'
+    status:
+      - type jq > /dev/null
