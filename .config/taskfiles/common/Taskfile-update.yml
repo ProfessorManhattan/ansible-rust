@@ -6,7 +6,6 @@ tasks:
     deps:
       - ':{{if eq .REPOSITORY_TYPE "packer"}}packer:update:descriptions{{else}}donothing{{end}}'
       - files
-      - :install:tslib
       - :python:requirementstxt
     cmds:
       - task: all:continue
