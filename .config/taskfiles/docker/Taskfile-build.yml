@@ -60,7 +60,7 @@ tasks:
           NEW_VERSION:
             sh: jq -r '.version' package.json
 
-          PREV_VERSION: '{{.VERRSION}}'
+          PREV_VERSION: '{{.VERSION}}'
   slim:
     deps:
       - :install:software:docker
