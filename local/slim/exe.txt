@@ -1,0 +1,8 @@
+yq
+jq
+git-cz
+jq
+husky
+commitlint
+yq
+jq

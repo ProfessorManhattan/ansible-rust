@@ -1,0 +1,8 @@
+install:software:yq
+install:software:jq
+install:npm:commitizen
+install:software:jq
+install:npm:husky
+install:npm:commitlint
+install:software:yq
+install:software:jq
