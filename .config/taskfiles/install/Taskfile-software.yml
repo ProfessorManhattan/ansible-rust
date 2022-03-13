@@ -4,11 +4,19 @@ version: '3'
 tasks:
   act:
     summary: |
-      ## Act
+      ## Simulate GitHub Actions Locally
 
-      A program that allows you to simulate GitHub Actions locally.
+      [Act]((https://github.com/nektos/act) gives you the capability to test
+      GitHub Actions locally. The program allows you to programmatically run
+      steps defined in your `.github/workflows/` folder. Just like GitHub,
+      it runs the actions in Docker containers. You can then simulate
+      your GitHub Actions with a CLI:
 
-      [GitHub](https://github.com/nektos/act)
+      **Example triggering pull_request flow:**
+      `act pull_request`
+
+      **Example running a specific job:**
+      `act -j test`
     run: once
     cmds:
       - task: brew:formulae
@@ -63,6 +71,7 @@ tasks:
           if type sudo &> /dev/null && sudo -n true; then
             echo | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           else
+            .config/log info 'Attempting to install Homebrew - you may be prompted for your `sudo` password'
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           fi
           if [ '{{.BODEGA}}' != 'true' ]; then
@@ -195,7 +204,7 @@ tasks:
     cmds:
       - .config/log warn "Archlinux support for Homebrew is not very well documented.. if this does not work and you can get it working, please open a PR :)"
       - |
-        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+        if [ "$USER" == "root" ]; then
           pacman update
           pacman -S base-devel curl file git gzip procps-ng
         elif type sudo &> /dev/null; then
@@ -216,7 +225,7 @@ tasks:
     interactive: true
     cmds:
       - |
-        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+        if [ "$USER" == "root" ]; then
           apt-get -y update
           apt-get install -y build-essential curl file git gzip procps
         elif type sudo &> /dev/null; then
@@ -242,7 +251,7 @@ tasks:
           yum grouplist 'Development Tools' &> "$HOME/.config/bodega/yum-devtools-check-ran"
           DEV_TOOLS_NOT_INSTALLED="$(grep 'No groups match' < "$HOME/.config/bodega/yum-devtools-check-ran" > /dev/null)"
           if [[ "$DEV_TOOLS_NOT_INSTALLED" == '0' ]]; then
-            if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+            if [ "$USER" == "root" ]; then
               yum groupinstall -y 'Development Tools'
             elif type sudo &> /dev/null; then
               .config/log info 'Attempting to run `sudo yum groupinstall -y "Development Tools"`'
@@ -252,7 +261,7 @@ tasks:
           touch "$HOME/.config/bodega/yum-devtools-check-ran"
         fi
         if ! rpm --quiet --query curl file git gzip procps-ng; then
-          if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+          if [ "$USER" == "root" ]; then
             yum install -y curl file git gzip procps-ng
           elif type sudo &> /dev/null; then
             .config/log info 'Attempting to run `sudo yum install -y curl file git procps-ng`'
@@ -263,7 +272,7 @@ tasks:
           source /etc/os-release
           if [[ "$ID" == 'fedora' ]] && [ "$VERSION_ID" -gt "29" ]; then
             if ! rpm --quiet --query libxcrypt-compat; then
-              if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+              if [ "$USER" == "root" ]; then
                 yum install -y libxcrypt-compat
               elif type sudo &> /dev/null; then
                 .config/log info 'Attempting to run `sudo yum -y install libxcrypt-compat` (Homebrew dependencies)'
@@ -784,10 +793,15 @@ tasks:
       PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
     cmds:
       - |
-        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+        if [ "$USER" == "root" ]; then
           apk --no-cache add {{.PACKAGE}}
-        elif type sudo &> /dev/null; then
+        elif type sudo &> /dev/null && sudo -n true; then
           sudo apk --no-cache add {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          .config/log info 'Running `sudo apk --no-cache add {{.PACKAGE}}`'
+          sudo apk --no-cache add {{.PACKAGE}}
+        else
+          .config/log warn '`sudo` unavailable and user has no permissions'
         fi
     status:
       - '[ -z "$(which apk)" ]'
@@ -797,12 +811,19 @@ tasks:
       PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
     cmds:
       - |
-        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+        if [ "$USER" == "root" ]; then
           apt-get update
           apt-get install -y {{.PACKAGE}}
-        elif type sudo &> /dev/null; then
+        elif type sudo &> /dev/null && sudo -n true; then
           sudo apt-get update
           sudo apt-get install -y {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          .config/log info 'Running `sudo apt-get update`'
+          sudo apt-get update
+          .config/log info 'Running `sudo apt-get install -y {{.PACKAGE}}`'
+          sudo apt-get install -y {{.PACKAGE}}
+        else
+           .config/log warn '`sudo` unavailable and user has no permissions'
         fi
     status:
       - '[ -z "$(which apt-get)" ]'
@@ -812,10 +833,15 @@ tasks:
       PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
     cmds:
       - |
-        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+        if [ "$USER" == "root" ]; then
           dnf install {{.PACKAGE}}
-        elif type sudo &> /dev/null; then
+        elif type sudo &> /dev/null && sudo -n true; then
           sudo dnf install {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          .config/log info 'Running `sudo dnf install {{.PACKAGE}}`'
+          sudo dnf install {{.PACKAGE}}
+        else
+           .config/log warn '`sudo` unavailable and user has no permissions'
         fi
     status:
       - '[ -z "$(which dnf)" ]'
@@ -825,10 +851,15 @@ tasks:
       PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
     cmds:
       - |
-        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+        if [ "$USER" == "root" ]; then
           pacman -S {{.PACKAGE}}
-        elif type sudo &> /dev/null; then
+        elif type sudo &> /dev/null && sudo -n true; then
           sudo pacman -S {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          .config/log info 'Running `sudo pacman -S {{.PACKAGE}}`'
+          sudo pacman -S {{.PACKAGE}}
+        else
+           .config/log warn '`sudo` unavailable and user has no permissions'
         fi
     status:
       - '[ -z "$(which pacman)" ]'
@@ -838,10 +869,15 @@ tasks:
       PACKAGE: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.PACKAGE}}{{end}}'
     cmds:
       - |
-        if [ "$EUID" -eq 0 ] || (type sudo &> /dev/null && sudo -n true); then
+        if [ "$USER" == "root" ]; then
           yum install -y {{.PACKAGE}}
-        elif type sudo &> /dev/null; then
+        elif type sudo &> /dev/null && sudo -n true; then
           sudo yum install -y {{.PACKAGE}}
+        elif type sudo &> /dev/null; then
+          .config/log info 'Running `sudo yum install -y {{.PACKAGE}}`'
+          sudo yum install -y {{.PACKAGE}}
+        else
+           .config/log warn '`sudo` unavailable and user has no permissions'
         fi
     status:
       - '[ -z "$(which yum)" ]'
@@ -935,12 +971,7 @@ tasks:
   yq:
     run: once
     cmds:
-      - task: system
-        vars:
-          PACKAGE: yq
       - task: brew:formulae
         vars:
           FORMULAE: yq
           INSTALL_TASK: '{{.TASK}}'
-    status:
-      - type jq > /dev/null

@@ -10,6 +10,8 @@ tasks:
       - task: checkout
       - task: lockfiles
       - task: before:npm
+    status:
+      - '[ -z "$CI" ]'
 
   before:npm:
     deps:
@@ -78,6 +80,8 @@ tasks:
           git commit -m "⤵️ automation(synchronize) Applying changes from upstream repository."
           git push -q -o ci.skip origin master
         fi
+    status:
+      - '[ -z "$CI" ]'
 
   commit:config:
     deps:
@@ -133,6 +137,8 @@ tasks:
       - >
         git submodule foreach 'git config user.email "$GITLAB_CI_EMAIL"; git config user.name "$GITLAB_CI_NAME";
         git checkout -q master; git pull -q origin master --ff-only'
+    status:
+      - '[ -z "$CI" ]'
 
   synchronize:
     log:
