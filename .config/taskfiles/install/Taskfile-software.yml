@@ -573,8 +573,6 @@ tasks:
       - task: install:software
         vars:
           PACKAGE: gh
-    status:
-      - type gh &> /dev/null
 
   git:
     run: once
@@ -845,7 +843,6 @@ tasks:
     cmds:
       - task: install:software
         vars:
-          BIN_NAME: cargo
           PACKAGE: rust
 
   sentry:
