@@ -185,7 +185,7 @@ The `requirements.yml` file contains a full list of the Ansible Galaxy dependenc
 
 | Dependency                                                                                                                                                                    | Description                                                                |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| <b><a href="https://galaxy.ansible.com/professormanhattan/snapd" title="professormanhattan.snapd on Ansible Galaxy" target="_blank">professormanhattan.snapd</a></b>          | Description unavailable                                                    |
+| <b><a href="https://galaxy.ansible.com/professormanhattan/snapd" title="professormanhattan.snapd on Ansible Galaxy" target="_blank">professormanhattan.snapd</a></b>          | Ensures Snap is installed and properly configured on Linux systems         |
 | <b><a href="https://galaxy.ansible.com/professormanhattan/homebrew" title="professormanhattan.homebrew on Ansible Galaxy" target="_blank">professormanhattan.homebrew</a></b> | Installs Homebrew (a package management system) on macOS and Linux systems |
 
 ### Galaxy Collections
