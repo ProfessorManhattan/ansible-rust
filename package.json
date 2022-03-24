@@ -40,13 +40,13 @@
   "dependencies": {},
   "optionalDependencies": {},
   "devDependencies": {
-    "@commitlint/config-conventional": "latest",
     "eslint-config-strict-mode": "latest",
     "git-cz-emoji": "latest",
-    "handlebars-helpers": "latest",
     "prettier-config-sexy-mode": "latest",
     "semantic-release-config": "latest",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "@commitlint/config-conventional": "latest",
+    "handlebars-helpers": "latest"
   },
   "keywords": [
     "ansible",
@@ -91,7 +91,7 @@
     "name": "Rust",
     "overview": "[Rust](https://www.rust-lang.org/) is a multi-paradigm programming language designed for performance and safety, especially safe concurrency.",
     "repository": {
-      "github": "https://github.com/ProfessorManhattan/ansible-rust",
+      "github": "https://github.com/megabyte-labs/ansible-rust",
       "gitlab": "https://gitlab.com/megabyte-labs/ansible-roles/rust"
     },
     "slug": "rust",
@@ -109,9 +109,7 @@
     "showAuthor": true
   },
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
+    "extends": [],
     "helpUrl": "https://megabyte.space/docs/contributing/commits"
   },
   "eslintConfig": {
