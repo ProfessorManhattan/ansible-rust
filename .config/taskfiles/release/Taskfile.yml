@@ -262,10 +262,6 @@ tasks:
       - task: notes:introduction
       - task: notes:project-specific
 
-  notes:introduction:
-    cmds:
-      - echo 'Grab this version by running:\n\n'
-
   notes:ansible:
     vars:
       PKG_NAME:
@@ -294,6 +290,10 @@ tasks:
     status:
       - '[ -z "$RELEASE_DOCKER" ]'
 
+  notes:introduction:
+    cmds:
+      - echo 'Grab this version by running:\n\n'
+
   notes:go:
     vars:
       GITHUB_GO_URL:
@@ -304,15 +304,6 @@ tasks:
       - echo '```\ngo install {{.GITHUB_GO_URL}}@v{{.VERSION}}\n```\n'
     status:
       - '[ -z "$RELEASE_GO" ]'
-
-  notes:project-specific:
-    deps:
-      - notes:ansible
-      - notes:docker
-      - notes:go
-      - notes:npm
-      - notes:packer
-      - notes:python
 
   notes:npm:
     vars:
@@ -339,6 +330,15 @@ tasks:
       - task: :build
     status:
       - '[ -z "$RELEASE_PACKER" ]'
+
+  notes:project-specific:
+    deps:
+      - notes:ansible
+      - notes:docker
+      - notes:go
+      - notes:npm
+      - notes:packer
+      - notes:python
 
   notes:python:
     vars:
