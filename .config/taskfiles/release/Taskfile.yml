@@ -146,6 +146,7 @@ tasks:
     status:
       - '[ "$SNAP_PACKAGE" == "null" ]'
 
+  # eslint-disable max-len
   analyze:
     summary: |
       | Command property | Description                                                                                                                                                |
@@ -159,6 +160,7 @@ tasks:
           echo 'patch'
         fi
 
+  # eslint-enable max-len
   build:
     deps:
       - build:ansible
@@ -260,6 +262,10 @@ tasks:
       - task: notes:introduction
       - task: notes:project-specific
 
+  notes:introduction:
+    cmds:
+      - echo 'Grab this version by running:\n\n'
+
   notes:ansible:
     vars:
       PKG_NAME:
@@ -299,9 +305,14 @@ tasks:
     status:
       - '[ -z "$RELEASE_GO" ]'
 
-  notes:introduction:
-    cmds:
-      - echo 'Grab this version by running:\n\n'
+  notes:project-specific:
+    deps:
+      - notes:ansible
+      - notes:docker
+      - notes:go
+      - notes:npm
+      - notes:packer
+      - notes:python
 
   notes:npm:
     vars:
@@ -328,15 +339,6 @@ tasks:
       - task: :build
     status:
       - '[ -z "$RELEASE_PACKER" ]'
-
-  notes:project-specific:
-    deps:
-      - notes:ansible
-      - notes:docker
-      - notes:go
-      - notes:npm
-      - notes:packer
-      - notes:python
 
   notes:python:
     vars:
